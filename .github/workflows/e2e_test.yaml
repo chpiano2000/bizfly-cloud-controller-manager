@@ -1,0 +1,30 @@
+name: Run E2E Test
+on:
+  push:
+    branches:
+      - "feat/e2e_test"
+jobs:
+  Build-and-push-to-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set output
+        id: vars
+        run: |
+          TAG=$(echo $GITHUB_SHA | cut -c1-5)
+          echo $TAG
+          echo "TAG=$RELEASE_VERSION" >> $GITHUB_ENV
+
+      - name: Check output
+        run: |
+          echo $TAG
+
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          registry: cr-hn-1.vccloud.vn
+          name: cr-hn-1.bizflycloud.vn/e9cc3c5affc148fa84a2baeb42d8703d/ccm-test:${{ env.TAG }}
+          username: ${{ secrets.ACCOUNT_EMAIL }}
+          password: ${{ secrets.ACCOUNT_PASSWORD }}
