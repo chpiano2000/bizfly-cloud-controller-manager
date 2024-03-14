@@ -1,8 +1,8 @@
 name: Run E2E Test
 on:
-  push:
+  pull_request:
     branches:
-      - "feat/e2e_test"
+      - master
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
