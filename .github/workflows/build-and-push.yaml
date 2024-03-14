@@ -1,0 +1,31 @@
+name: Build-and-push-to-registry
+on:
+  push:
+    branches:
+      - "feat/e2e_test"
+jobs:
+  Build-and-push-to-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Set output
+        id: vars
+        run: |
+          TAG=$(echo $GITHUB_SHA | cut -c1-5)
+          IMAGE="cr-hn-1.bizflycloud.vn/e9cc3c5affc148fa84a2baeb42d8703d/ccm-test:$TAG"
+          echo $IMAGE
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Check output
+        run: |
+          echo $IMAGE
+
+      - name: Publish to Registry
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          registry: cr-hn-1.bizflycloud.vn
+          name: ${{ env.IMAGE }}
+          username: ${{ secrets.ACCOUNT_EMAIL }}
+          password: ${{ secrets.ACCOUNT_PASSWORD }}

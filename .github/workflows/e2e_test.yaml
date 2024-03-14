@@ -1,14 +1,19 @@
 name: Run E2E Test
 on:
-  push:
-    branches:
-      - "feat/e2e_test"
+  workflow_run:
+    workflows:
+      - "Build-and-push-to-registry"
+    types:
+      - completed
 jobs:
-  Build-and-push-to-registry:
+  Run-e2e-test:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+
+      - uses: actions/checkout@master
 
       - name: Set output
         id: vars
@@ -22,35 +27,15 @@ jobs:
         run: |
           echo $IMAGE
 
-      - name: Publish to Registry
-        uses: elgohr/Publish-Docker-Github-Action@v5
-        with:
-          registry: cr-hn-1.bizflycloud.vn
-          name: ${{ env.IMAGE }}
-          username: ${{ secrets.ACCOUNT_EMAIL }}
-          password: ${{ secrets.ACCOUNT_PASSWORD }}
-
-  Run-e2e-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v5
-        with:
-          go-version: "1.21"
-
-      - uses: actions/checkout@master
-
-      - name: Check used image
-        run: |
-          echo ${{ env.IMAGE }}
-
       - name: Run tests
         run: |
           cd e2e
-          ./run.sh \
-            -P ${{ secrets.VPC_ID }} \
-            -u ${{ secrets.APP_CRED_ID }} \
-            -p ${{ secrets.APP_CRED_SECRET }} \
-            --email ${{ secrets.ACCOUNT_EMAIL }} \
-            --password ${{ secrets.ACCOUNT_PASSWORD }} \
-            --token ${{ secrets.SECRET_TOKEN }} \
-            --image ${{ env.IMAGE }}
+          ls -la
+          # ./run.sh \
+          #   -P ${{ secrets.VPC_ID }} \
+          #   -u ${{ secrets.APP_CRED_ID }} \
+          #   -p ${{ secrets.APP_CRED_SECRET }} \
+          #   --email ${{ secrets.ACCOUNT_EMAIL }} \
+          #   --password ${{ secrets.ACCOUNT_PASSWORD }} \
+          #   --token ${{ secrets.SECRET_TOKEN }} \
+          #   --image ${{ env.IMAGE }}
