@@ -55,12 +55,12 @@ jobs:
       - name: Run tests
         run: |
           cd e2e
-          ls -la
-          # ./run.sh \
-          #   -P ${{ secrets.VPC_ID }} \
-          #   -u ${{ secrets.APP_CRED_ID }} \
-          #   -p ${{ secrets.APP_CRED_SECRET }} \
-          #   --email ${{ secrets.ACCOUNT_EMAIL }} \
-          #   --password ${{ secrets.ACCOUNT_PASSWORD }} \
-          #   --token ${{ secrets.SECRET_TOKEN }} \
-          #   --image ${{ env.IMAGE }}
+          # ls -la
+          ./run.sh \
+            -P ${{ secrets.VPC_ID }} \
+            -u ${{ secrets.APP_CRED_ID }} \
+            -p ${{ secrets.APP_CRED_SECRET }} \
+            --email ${{ secrets.ACCOUNT_EMAIL }} \
+            --password ${{ secrets.ACCOUNT_PASSWORD }} \
+            --token ${{ secrets.SECRET_TOKEN }} \
+            --image ${{ env.IMAGE }}
