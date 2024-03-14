@@ -24,7 +24,7 @@ jobs:
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
-          registry: cr-hn-1.vccloud.vn
+          registry: cr-hn-1.bizflycloud.vn
           name: cr-hn-1.bizflycloud.vn/e9cc3c5affc148fa84a2baeb42d8703d/ccm-test:${{ env.TAG }}
           username: ${{ secrets.ACCOUNT_EMAIL }}
           password: ${{ secrets.ACCOUNT_PASSWORD }}
