@@ -14,17 +14,43 @@ jobs:
         id: vars
         run: |
           TAG=$(echo $GITHUB_SHA | cut -c1-5)
-          echo $TAG
-          echo "TAG=$TAG" >> $GITHUB_ENV
+          IMAGE="cr-hn-1.bizflycloud.vn/e9cc3c5affc148fa84a2baeb42d8703d/ccm-test:$TAG"
+          echo $IMAGE
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
       - name: Check output
         run: |
-          echo $TAG
+          echo $IMAGE
 
       - name: Publish to Registry
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           registry: cr-hn-1.bizflycloud.vn
-          name: cr-hn-1.bizflycloud.vn/e9cc3c5affc148fa84a2baeb42d8703d/ccm-test:${{ env.TAG }}
+          name: ${{ env.IMAGE }}
           username: ${{ secrets.ACCOUNT_EMAIL }}
           password: ${{ secrets.ACCOUNT_PASSWORD }}
+
+  Run-e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+
+      - uses: actions/checkout@master
+
+      - name: Check used image
+        run: |
+          echo ${{ env.IMAGE }}
+
+      - name: Run tests
+        run: |
+          cd e2e
+          ./run.sh \
+            -P ${{ secrets.VPC_ID }} \
+            -u ${{ secrets.APP_CRED_ID }} \
+            -p ${{ secrets.APP_CRED_SECRET }} \
+            --email ${{ secrets.ACCOUNT_EMAIL }} \
+            --password ${{ secrets.ACCOUNT_PASSWORD }} \
+            --token ${{ secrets.SECRET_TOKEN }} \
+            --image ${{ env.IMAGE }}
