@@ -1,10 +1,8 @@
 name: Run E2E Test
 on:
-  workflow_run:
-    workflows:
-      - "Build-and-push-to-registry"
-    types:
-      - completed
+  push:
+    branches:
+      - "feat/e2e_test"
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
