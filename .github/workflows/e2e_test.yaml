@@ -52,12 +52,6 @@ jobs:
         run: |
           echo $IMAGE
 
-      - name: Change directory to e2e
-        run: cd e2e
-
-      - name: Install dependencies
-        run: go mod download
-
       - name: Run tests
         run: |
           cd e2e
