@@ -55,7 +55,8 @@ jobs:
       - name: Run tests
         run: |
           cd e2e
-          go mod download
+          go install github.com/onsi/ginkgo/v2/ginkgo
+          export PATH=$PATH:$(go env GOPATH)/bin
           ./run.sh \
             -v ${{ secrets.VERSION_UID }} \
             -P ${{ secrets.VPC_ID }} \
