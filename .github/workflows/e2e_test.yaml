@@ -57,6 +57,7 @@ jobs:
           cd e2e
           # ls -la
           ./run.sh \
+            -v ${{ secrets.VERSION_UID }} \
             -P ${{ secrets.VPC_ID }} \
             -u ${{ secrets.APP_CRED_ID }} \
             -p ${{ secrets.APP_CRED_SECRET }} \
