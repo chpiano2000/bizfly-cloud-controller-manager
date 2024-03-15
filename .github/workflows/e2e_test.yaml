@@ -1,6 +1,6 @@
 name: Run E2E Test
 on:
-  pull_request:
+  push:
     branches:
       - master
 jobs:
