@@ -123,7 +123,7 @@ var _ = Describe("CCM E2E Tests", func() {
 					labels = map[string]string{
 						"app": "test-loadbalancer",
 					}
-					annotations[bizflyNodeLabel] = "env=staging"
+					annotations[bizflyNodeLabel] = "test-ccm=node01"
 
 					By("Creating Pods")
 					createPodWithLabel(pods, ports, framework.TestServerImage, labels, true)
