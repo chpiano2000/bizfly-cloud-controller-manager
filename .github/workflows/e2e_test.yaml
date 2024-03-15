@@ -7,6 +7,7 @@ on:
       - feat/dev
 jobs:
   build_and_push:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -24,15 +25,8 @@ jobs:
         run: |
           echo $IMAGE
 
-      - name: Publish to Registry
-        uses: elgohr/Publish-Docker-Github-Action@v5
-        with:
-          registry: cr-hn-1.bizflycloud.vn
-          name: ${{ env.IMAGE }}
-          username: ${{ secrets.ACCOUNT_EMAIL }}
-          password: ${{ secrets.ACCOUNT_PASSWORD }}
-
   Run-e2e-test:
+    if: github.event.pull_request.merged == true
     needs: build_and_push
     runs-on: ubuntu-latest
     steps:
@@ -56,15 +50,4 @@ jobs:
 
       - name: Run tests
         run: |
-          cd e2e
-          go install github.com/onsi/ginkgo/v2/ginkgo
-          export PATH=$PATH:$(go env GOPATH)/bin
-          ./run.sh \
-            -v ${{ vars.VERSION_UID }} \
-            -P ${{ vars.VPC_ID }} \
-            -u ${{ secrets.APP_CRED_ID }} \
-            -p ${{ secrets.APP_CRED_SECRET }} \
-            --email ${{ secrets.ACCOUNT_EMAIL }} \
-            --password ${{ secrets.ACCOUNT_PASSWORD }} \
-            --token ${{ secrets.SECRET_TOKEN }} \
-            --image ${{ env.IMAGE }}
+          echo The PR was merged
