@@ -1,8 +1,10 @@
 name: Run E2E Test
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
-      - master
+      - feat/dev
 jobs:
   build_and_push:
     runs-on: ubuntu-latest
@@ -14,7 +16,7 @@ jobs:
         id: vars
         run: |
           TAG=$(echo $GITHUB_SHA | cut -c1-5)
-          IMAGE="cr-hn-1.bizflycloud.vn/e9cc3c5affc148fa84a2baeb42d8703d/ccm-test:$TAG"
+          IMAGE="${{ vars.IMAGE_PREFIX }}:$TAG"
           echo $IMAGE
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
@@ -44,7 +46,7 @@ jobs:
         id: vars
         run: |
           TAG=$(echo $GITHUB_SHA | cut -c1-5)
-          IMAGE="cr-hn-1.bizflycloud.vn/e9cc3c5affc148fa84a2baeb42d8703d/ccm-test:$TAG"
+          IMAGE="${{ vars.IMAGE_PREFIX }}:$TAG"
           echo $IMAGE
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
@@ -58,8 +60,8 @@ jobs:
           go install github.com/onsi/ginkgo/v2/ginkgo
           export PATH=$PATH:$(go env GOPATH)/bin
           ./run.sh \
-            -v ${{ secrets.VERSION_UID }} \
-            -P ${{ secrets.VPC_ID }} \
+            -v ${{ vars.VERSION_UID }} \
+            -P ${{ vars.VPC_ID }} \
             -u ${{ secrets.APP_CRED_ID }} \
             -p ${{ secrets.APP_CRED_SECRET }} \
             --email ${{ secrets.ACCOUNT_EMAIL }} \

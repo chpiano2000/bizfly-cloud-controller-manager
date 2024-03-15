@@ -126,7 +126,7 @@ else
 		# Check if the elapsed time has exceeded the timeout duration
 		if [ $elapsed_time -ge $timeout_duration ]; then
 			echo "Timeout exceeded. Exiting loop."
-			break
+			exit 1
 		fi
 
 		# If status is not yet "PROVISIONED" and timeout has not occurred, wait for some time before checking again
@@ -173,4 +173,3 @@ ginkgo -v --json-report=report.json -- \
 	--use-existing=false \
 	--app-cred-secret="$APP_CRED_SECRET" \
 	--cluster-uid="$CLUSTER_UID"
-
