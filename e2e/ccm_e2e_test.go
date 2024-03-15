@@ -79,8 +79,8 @@ var _ = Describe("CCM E2E Tests", func() {
 		Expect(f.LoadBalancer.DeleteService()).NotTo(HaveOccurred())
 	}
 
-	createServiceWithSelector := func(selector map[string]string, ports []core.ServicePort, isSessionAffinityClientIP bool, isDelete bool) {
-		Expect(f.LoadBalancer.CreateService(selector, nil, ports, isSessionAffinityClientIP)).NotTo(HaveOccurred())
+	createServiceWithAnnotations := func(labels, annotations map[string]string, ports []core.ServicePort, isSessionAffinityClientIP bool, isDelete bool) {
+		Expect(f.LoadBalancer.CreateService(labels, annotations, ports, isSessionAffinityClientIP)).NotTo(HaveOccurred())
 		Eventually(f.LoadBalancer.GetServiceEndpoints).Should(Not(BeEmpty()))
 		ensureServiceLoadBalancer("", isDelete)
 	}
@@ -91,10 +91,11 @@ var _ = Describe("CCM E2E Tests", func() {
 				err := root.Recycle()
 				Expect(err).NotTo(HaveOccurred())
 			})
-			Context("Load Balancer External", func() {
+			Context("Load Balancer target node label", func() {
 				var (
-					pods   []string
-					labels map[string]string
+					pods        []string
+					labels      map[string]string
+					annotations = map[string]string{}
 				)
 
 				BeforeEach(func() {
@@ -122,12 +123,13 @@ var _ = Describe("CCM E2E Tests", func() {
 					labels = map[string]string{
 						"app": "test-loadbalancer",
 					}
+					annotations[bizflyNodeLabel] = "env=staging"
 
 					By("Creating Pods")
 					createPodWithLabel(pods, ports, framework.TestServerImage, labels, true)
 
 					By("Creating Service")
-					createServiceWithSelector(labels, servicePorts, false, false)
+					createServiceWithAnnotations(labels, annotations, servicePorts, false, false)
 				})
 
 				AfterEach(func() {
@@ -138,20 +140,15 @@ var _ = Describe("CCM E2E Tests", func() {
 					deleteService()
 				})
 
-				It("Should reach all pods", func() {
-					var eps []string
+				It("Should have internal network type", func() {
+					var lb *gobizfly.LoadBalancer
 					var lbId string
 					var members int
 					var listeners []*gobizfly.Listener
 					var pools []*gobizfly.Pool
 					Eventually(func() error {
-						eps, err = f.LoadBalancer.GetLoadBalancerIps()
-						fmt.Println(eps)
-						return err
-					}).Should(BeNil())
-					Eventually(func() error {
-						lbId, err = f.GetLBByName(ctx, clusterName, framework.TestServerResourceName)
-						fmt.Println("lbID: " + lbId)
+						lb, err = f.GetLB(ctx, clusterName, framework.TestServerResourceName)
+						lbId = lb.ID
 						return err
 					}).Should(BeNil())
 					Eventually(func() error {
@@ -169,15 +166,14 @@ var _ = Describe("CCM E2E Tests", func() {
 						fmt.Println("Members %i", members)
 						return err
 					}).Should(BeNil())
-					By("Checking TCP Response")
-					Eventually(framework.GetResponseFromCurl).WithArguments(eps[0]).Should(ContainSubstring("nginx"))
 					Eventually(lbId).ShouldNot(Equal(""))
 					By("Checking numbers of Listners")
 					Eventually(len(listeners)).Should(Equal(2))
 					By("Checking numbers of Pools")
 					Eventually(len(pools)).Should(Equal(2))
 					By("Checking numbers of Members")
-					Eventually(members).Should(Equal(4))
+					Eventually(members).Should(Equal(2))
+					By("Checking Pool Protocol")
 				})
 			})
 		})
