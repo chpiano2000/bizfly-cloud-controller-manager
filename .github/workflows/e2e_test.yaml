@@ -65,7 +65,7 @@ jobs:
             -v ${{ vars.VERSION_UID }} \
             -P ${{ vars.VPC_ID }} \
             -u ${{ secrets.APP_CRED_ID }} \
-            -p ${{ secrets.APP_CRED_SECRET }} \
+            -p "${{ secrets.APP_CRED_SECRET }}" \
             --email ${{ secrets.ACCOUNT_EMAIL }} \
             --password "${{ secrets.ACCOUNT_PASSWORD }}" \
             --token ${{ secrets.SECRET_TOKEN }} \
