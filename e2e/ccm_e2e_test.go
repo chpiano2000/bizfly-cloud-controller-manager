@@ -61,9 +61,8 @@ var _ = Describe("CCM E2E Tests", func() {
 		ensureServiceLoadBalancer(namespace, false)
 	}
 
-	destroyIngressController := func(namespace string) {
+	destroyIngressController := func() {
 		Expect(f.LoadBalancer.UninstallIngressController()).NotTo(HaveOccurred())
-		ensureServiceLoadBalancer(namespace, true)
 	}
 
 	Describe("Test", func() {
@@ -83,7 +82,7 @@ var _ = Describe("CCM E2E Tests", func() {
 
 				AfterEach(func() {
 					By("Destroying Nginx ingress controller")
-					destroyIngressController(namespace)
+					destroyIngressController()
 				})
 
 				It("Should have external IP as a hostname", func() {
